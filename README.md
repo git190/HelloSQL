@@ -1,8 +1,10 @@
 # HelloSQL
 
-语法结构：select—from—where—group by—having—order by—limit
-运行顺序：from后面一堆——select
-【标准语法】
+## 1. 语法
+### 语法基础
+select—from—where—group by—having—order by—limit
+from后面一堆——select
+### 标准语法
 ● select字段名1
 ● from 表名
 ● [where 表达式]，			聚合前筛选
