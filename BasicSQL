@@ -1,3 +1,7 @@
+/*
+基础语句
+*/
+
 -- 查询指定字段并返回
 SELECT population,name FROM world
   WHERE name in ('Germany','China');
@@ -75,3 +79,111 @@ SELECT name, SUBSTRING(capital, LENGTH(name) + 1) AS extension
 FROM world
 WHERE capital LIKE CONCAT(name, '%') 
   AND LENGTH(capital) > LENGTH(name);
+
+
+/*
+聚合函数
+*/
+
+-- 列简单计算
+select name,(gdp/population)
+select name,ROUND(population / 1000000.0, 2)  --保留两位
+select avg(gdp) --直接返回计算结果 
+
+-- 💦group by, 聚合
+select continent, count(name)  -- 在groupby基础上，计算大洲内各国家数量
+  from world
+  group by continent  -- 聚合大洲内的国家，放在一起，去重continent和name重复值
+
+select yr, subject, count(winner)  	--计算每年各科目的获奖人数
+  from nobel
+  where yr between 2013 and 2015
+  group by yr, subject		-- 聚合年份和科目，得到人
+  order by yr desc, count(winner) asc		--排序
+
+-- 💦 having，聚合后筛选
+select continent
+  from world
+  group by continent									--先groupby
+  having sum(population)>=100000000 	--再，大洲总人口超过1亿元
+
+/*
+一些函数
+*/
+
+-- 💦round，
+select name,round(gdp/population,-3)  -- -3表示四舍五入到千位，比如21254变为21000
+round(12.456,2)  --结果为12.47
+round(123.4,-2)		--结果为100
+
+
+-- 💦 concat字符串组合
+select capital,name 
+from world
+where capital like CONCAT('%', name, '%');  -- 表示name在capital字符串中
+  and capital <> name  --  字符完全不相同
+  
+WHERE capital like concat(name,' City')  -- name City组合
+
+
+-- 💦replace, 替换函数
+replace('A',a)  --A替换为a
+
+
+--💦left right, 提取第几个字符，substring(string, start_position, length)
+SELECT name,  capital
+  FROM world
+  where LEFT(name,1)= LEFT(capital ,1)  --提取左数第一个字符
+  and name!=capital
+
+substring('najfa', -2, 1) 		--从-2位开始提取3个字符，得到f
+SUBSTRING('Hello, World!', 8)	--从第 8 个字符开始提取，提取到字符串的末尾，得到world！
+
+
+-- 💦cast(x as type)，数据类型转换函数
+-- type参数可以写为，char(n),date,time,datetime,decima等
+
+
+-- 时间函数
+-- 💦year(date), month(date), day(date)，获取对应年，月，日
+-- 💦date_add，对起始时间进行加操作，date_sub，时间进行减操作
+-- 💦datediff，算两个日期的天数差
+-- 💦date_format，格式化
+
+
+-- 条件判断函数
+-- 💦if(expr,v1,v2)，条件返回，满足if返回v1，
+-- 💦case when，
+
+
+/*
+一些函数
+*/
+
+
+-- 窗口函数💦over
+-- over([partition by 字段名] [order by 字段名 asc|desc])
+-- 排序 rank()over() dense_rank()over() row_number()over()
+-- 向上偏移 lag(字段名,偏移量[,默认值])over() 
+-- 向下偏移，lead(字段名,偏移量[,默认值])over() 
+
+-- over例题
+select year, party, votes,  --  --查询s1400大区，每年不同party得票数votes，
+  rank()over(partition by year order by votes desc) as posn	--候选人根据votes排序
+  from ge
+  where district = 's1400'		
+  order by party year --最后团体和时间排序
+
+-- 偏移例题
+select 
+country
+,date_format(time,'%Y-%m-%d',) date  --标准年月日时间 
+,confirmed 截止当天累计确诊数
+,lag(confirmed,1)over(partition by country order by time) 截止昨天累计确诊数
+,(confirmed-lag(confirmed,1)over(partition by country order by time)) 每天新增
+  from covid
+  where country in ('Frence', 'Germany') and month(time)=1
+  order by time
+
+
+
