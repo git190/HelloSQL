@@ -1,0 +1,77 @@
+-- 查询指定字段并返回
+SELECT population,name FROM world
+  WHERE name in ('Germany','China');
+
+-- 查询所有字段
+select * from world;
+
+-- 改名
+select name 国家, population 人口;
+
+-- 查询结果去重
+select distinct name from world  
+select distinct name population from world  --后两列唯一值
+select name,round(gdp/population,-3)  -- -3表示四舍五入到千位，比如21254变为21000
+
+-- 💦 查询带单引号
+SELECT * FROM nobel
+ where winner ='EUGENE O''NEILL'  --名字叫EUGENE O'NEILL，多加一个引号
+
+-- 💦order by, 排序
+-- 用法：列名，列名，列名+ decs 或asc表示降序或升序
+SELECT winner,yr,subject FROM nobel
+ where winner like 'Sir%' 
+ order by yr desc, winner asc  -- 先year列降序，再winenr升序 
+
+-- 💦ORDER BY subject in ,返回布尔值（true或false）
+  -- 不在化学和物理的返回False，再按照subject默认升序，True在False后面，自然就排在最底下
+  ORDER BY subject in ('chemistry ', 'physics '),subject,winner 
+
+-- 列简单计算
+select name,(gdp/population)
+select name,ROUND(population / 1000000.0, 2)  --保留两位
+
+-- 💦 where 查询列的指定范围
+-- 运算符（＞，＜），范围（not in等），逻辑判断（is null，优先级and＞or）
+select name, populaition form word
+  where populaition between 1000 and 2000;
+
+select name,population,area
+from world
+where (area >= 3000000 or population >= 250000000)
+ AND NOT (area >= 3000000 AND population >= 250000000);  -- 不能同时满足
+ 
+
+-- 💦 like 字符筛选
+-- %代表零或多个字符，下划线_占位符代表单独字符
+select name from world
+  where name like 'Y%'  -- 表示y开头
+
+
+-- 💦 count，计算数量
+select count(*)  -- count()括号里没有字段，计算行数，有，计算该列多少行，忽略nan行
+from world
+
+
+--💦 length 计算字符串长度
+SELECT name, capital
+  FROM world
+ WHERE LENGTH(name) = length(capital)
+
+
+
+--💦 limit，取数。仅在MySQL中使用，卸载
+ SELECT name,  capital
+FROM world
+order by name
+limit 3,4  -- 从第3+1行开始，取4行，到第7行
+limit 3  -- 取前三行
+
+
+
+-- 💥💥💥查询和替换
+-- 提取name后缀，生产一列extension
+SELECT name, SUBSTRING(capital, LENGTH(name) + 1) AS extension
+FROM world
+WHERE capital LIKE CONCAT(name, '%') 
+  AND LENGTH(capital) > LENGTH(name);
